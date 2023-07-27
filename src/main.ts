@@ -4,7 +4,7 @@ import Cliente from "./models/Cliente";
 let ingresos: any = [];
 
 
-
+let pos = -1;
 let editando = false;
 
 
@@ -12,7 +12,8 @@ const formulario = document.querySelector<HTMLFormElement>('#formularioCliente')
 
 const cedulaInput: any = document.querySelector<HTMLInputElement>('#cedula');
 const nombresInput: any = document.querySelector<HTMLInputElement>('#nombres');
-const sexoInput: any = document.querySelector<HTMLInputElement>('#sexo');
+const sexoM: any = document.querySelector<HTMLInputElement>('#sexoM');
+const sexoF: any = document.querySelector<HTMLInputElement>('#sexoF');
 const estadoCivilSelect: any = document.querySelector<HTMLSelectElement>('#estadoCivil');
 const edadInput: any = document.querySelector<HTMLInputElement>('#edad');
 const nombreElectrodomesticoInput: any = document.querySelector<HTMLInputElement>('#nombre');
@@ -26,16 +27,33 @@ const btnGuardar = document.querySelector<HTMLButtonElement>('#btnGuardar')!;
 
 
 
+
+
 formulario.addEventListener('submit', validarFormulario);
 
 function validarFormulario(e: Event) {
   e.preventDefault();
-  const electro = new Electrodomestico(nombreElectrodomesticoInput?.value, precioBaseInput?.value, colorSelect?.value, consumoEnergeticoInput?.value, pesoInput?.value);
-  const cli = new Cliente(cedulaInput?.value, nombresInput?.value, sexoInput?.value, estadoCivilSelect?.value, edadInput?.value, electro);
+  let sexoInput: string = '';
+
+  // Verificar si el input de tipo radio sexoM está seleccionado
+  if (sexoM.checked) {
+    // Asignar el valor "M" a la variable sexoInput
+    sexoInput = "M";
+  }
+  // Verificar si el input de tipo radio sexoF está seleccionado
+  else if (sexoF.checked) {
+    // Asignar el valor "F" a la variable sexoInput
+    sexoInput = "F";
+  }
+  console.log(sexoInput);
+
+  const electro = new Electrodomestico(nombreElectrodomesticoInput?.value, Number(precioBaseInput?.value), colorSelect?.value, consumoEnergeticoInput?.value, pesoInput?.value);
+  const cli = new Cliente(cedulaInput?.value, nombresInput?.value, sexoInput, estadoCivilSelect?.value, edadInput?.value, electro);
   console.log(cli);
 
   if (editando) {
-    editandoRegistro();
+    modificarRegistro(cli);
+    limpiarFormulario();
     editando = false;
   } else {
     agregar(cli);
@@ -47,15 +65,18 @@ function agregar(obj: Cliente) {
   ingresos.push(obj);
   console.log(ingresos);
   mostrarTabla();
+  asignarEventosBotones();
 
 }
 
-function editandoRegistro() {
-
+function modificarRegistro(obj: Cliente) {
+  ingresos[pos] = obj;
+  mostrarTabla();
+  asignarEventosBotones();
 }
 
 function generarTabla() {
-  let tablaHTML = '<table>';
+  let tablaHTML = '<table class="table table-bordered">';
 
   tablaHTML += `
     <tr>
@@ -69,6 +90,7 @@ function generarTabla() {
       <th>Color</th>
       <th>Consumo Energético</th>
       <th>Peso</th>
+      <th>Presio Final</th>
       <th>Acciones</th>
     </tr>
   `;
@@ -88,9 +110,10 @@ function generarTabla() {
         <td>${electrodomestico.getColor()}</td>
         <td>${electrodomestico.getConsumoEnergetico()}</td>
         <td>${electrodomestico.getPeso()}</td>
+        <td>${electrodomestico.precioFinal()}</td>
         <td>
-          <button onclick="${editarRegistro(i)}">Editar</button>
-          <button onclick="${eliminarRegistro(i)}">Eliminar</button>
+        <button class="btn btn-warning" id="editarBtn-${i}">Editar</button>
+        <button  class="btn btn-danger" id="eliminarBtn-${i}">Eliminar</button>
         </td>
       </tr>
     `;
@@ -99,6 +122,19 @@ function generarTabla() {
   tablaHTML += '</table>';
 
   return tablaHTML;
+}
+
+function asignarEventosBotones() {
+  const botonesEditar = document.querySelectorAll<HTMLButtonElement>('button[id^="editarBtn-"]');
+  const botonesEliminar = document.querySelectorAll<HTMLButtonElement>('button[id^="eliminarBtn-"]');
+
+  botonesEditar.forEach((boton, index) => {
+    boton.addEventListener('click', () => editarRegistro(index));
+  });
+
+  botonesEliminar.forEach((boton, index) => {
+    boton.addEventListener('click', () => eliminarRegistro(index));
+  });
 }
 
 function mostrarTabla() {
@@ -118,7 +154,16 @@ function editarRegistro(index: number) {
   // Cargar los datos del cliente en el formulario
   cedulaInput.value = cliente.getCedula();
   nombresInput.value = cliente.getNombres();
-  sexoInput.value = cliente.getSexo();
+  const sexoCliente = cliente.getSexo();
+  console.log(sexoCliente);
+  // Verificar si el sexo es "M" (masculino)
+  if (sexoCliente === "M") {
+    // Marcar el input de tipo radio con id="sexoM"
+    sexoM.checked = true;
+  } else if (sexoCliente === "F") {
+    // Marcar el input de tipo radio con id="sexoF"
+    sexoF.checked = true;
+  }
   estadoCivilSelect.value = cliente.getEstadoCivil();
   edadInput.value = cliente.getEdad().toString();
 
@@ -128,7 +173,7 @@ function editarRegistro(index: number) {
   colorSelect.value = electrodomestico.getColor();
   consumoEnergeticoInput.value = electrodomestico.getConsumoEnergetico();
   pesoInput.value = electrodomestico.getPeso().toString();
-
+  pos = index;
   // Establecer la variable "editando" en true
   editando = true;
 }
@@ -144,7 +189,8 @@ function limpiarFormulario() {
   // Limpiar los campos del formulario
   cedulaInput.value = '';
   nombresInput.value = '';
-  sexoInput.checked = false;
+  sexoF.checked = false;
+  sexoM.checked = false;
   estadoCivilSelect.value = '';
   edadInput.value = '';
 
@@ -156,6 +202,7 @@ function limpiarFormulario() {
 
   // Restablecer la variable "editando" a false
   editando = false;
+  pos = -1;
 }
 
 // Evento para mostrar la tabla al cargar la página
