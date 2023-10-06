@@ -24,11 +24,6 @@ const pesoInput: any = document.querySelector<HTMLInputElement>('#peso');
 const btnGuardar = document.querySelector<HTMLButtonElement>('#btnGuardar')!;
 
 
-
-
-
-
-
 formulario.addEventListener('submit', validarFormulario);
 
 function validarFormulario(e: Event) {
@@ -76,46 +71,50 @@ function modificarRegistro(obj: Cliente) {
 }
 
 function generarTabla() {
-  let tablaHTML = '<table class="table table-bordered">';
+  let tablaHTML = '<table  class="w-full text-sm text-left text-gray-500">';
 
   tablaHTML += `
-    <tr>
-      <th>Cédula</th>
-      <th>Nombres</th>
-      <th>Sexo</th>
-      <th>Estado Civil</th>
-      <th>Edad</th>
-      <th>Nombre Electrodoméstico</th>
-      <th>Precio Base</th>
-      <th>Color</th>
-      <th>Consumo Energético</th>
-      <th>Peso</th>
-      <th>Presio Final</th>
-      <th>Acciones</th>
-    </tr>
+  <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3">Cédula</th>
+        <th scope="col" class="px-6 py-3">Nombres</th>
+        <th scope="col" class="px-6 py-3">Sexo</th>
+        <th scope="col" class="px-6 py-3">Estado Civil</th>
+        <th scope="col" class="px-6 py-3">Edad</th>
+        <th scope="col" class="px-6 py-3">Nombre Electrodoméstico</th>
+        <th scope="col" class="px-6 py-3">Precio Base</th>
+        <th scope="col" class="px-6 py-3">Color</th>
+        <th scope="col" class="px-6 py-3">Consumo Energético</th>
+        <th scope="col" class="px-6 py-3">Peso</th>
+        <th scope="col" class="px-6 py-3">Presio Final</th>
+        <th scope="col" class="px-6 py-3">Acciones</th>
+      </tr>
+    </thead>
   `;
 
   for (let i = 0; i < ingresos.length; i++) {
     const cliente = ingresos[i];
     const electrodomestico = cliente.getElectrodomestico();
     tablaHTML += `
-      <tr>
-        <td>${cliente.getCedula()}</td>
-        <td>${cliente.getNombres()}</td>
-        <td>${cliente.getSexo()}</td>
-        <td>${cliente.getEstadoCivil()}</td>
-        <td>${cliente.getEdad()}</td>
-        <td>${electrodomestico.getNombre()}</td>
-        <td>${electrodomestico.getPrecioBase()}</td>
-        <td>${electrodomestico.getColor()}</td>
-        <td>${electrodomestico.getConsumoEnergetico()}</td>
-        <td>${electrodomestico.getPeso()}</td>
-        <td>${electrodomestico.precioFinal()}</td>
+    <tbody>
+      <tr  class="bg-white border-b ">
+        <td class="px-6 py-4">${cliente.getCedula()}</td>
+        <td class="px-6 py-4">${cliente.getNombres()}</td>
+        <td class="px-6 py-4">${cliente.getSexo()}</td>
+        <td class="px-6 py-4">${cliente.getEstadoCivil()}</td>
+        <td class="px-6 py-4">${cliente.getEdad()}</td>
+        <td class="px-6 py-4">${electrodomestico.getNombre()}</td>
+        <td class="px-6 py-4">${electrodomestico.getPrecioBase()}</td>
+        <td class="px-6 py-4">${electrodomestico.getColor()}</td>
+        <td class="px-6 py-4">${electrodomestico.getConsumoEnergetico()}</td>
+        <td class="px-6 py-4">${electrodomestico.getPeso()}</td>
+        <td class="px-6 py-4" >${electrodomestico.precioFinal()}</td>
         <td>
-        <button class="btn btn-warning" id="editarBtn-${i}">Editar</button>
-        <button  class="btn btn-danger" id="eliminarBtn-${i}">Eliminar</button>
+        <button  class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900" id="editarBtn-${i}">Editar</button>
+        <button  class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" id="eliminarBtn-${i}">Eliminar</button>
         </td>
       </tr>
+      </tbody>
     `;
   }
 
